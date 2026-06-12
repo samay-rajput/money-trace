@@ -3,6 +3,7 @@ import fitz  # PyMuPDF
 import pytesseract
 from pdf2image import convert_from_path
 
+from PIL import Image 
 
 
 def extract_with_pdfplumber(pdf_path: str) -> str:
@@ -37,7 +38,7 @@ def extract_with_ocr(pdf_path: str) -> str:
     return text
 
 
-def extract_text(pdf_path: str) -> str:
+def extract_from_pdf(pdf_path: str) -> str:
     text = extract_with_pdfplumber(pdf_path)
 
     if len(text.strip()) > 500:
@@ -50,9 +51,24 @@ def extract_text(pdf_path: str) -> str:
     return extract_with_ocr(pdf_path)
 
 
+def extract_from_image(image_path: str) -> str:
+    img = Image.open(image_path)
+    text = pytesseract.image_to_string(img)
+    return text
+
+
+import os
+
+def extract_text_auto(path: str) -> str:
+    ext = os.path.splitext(path)[1].lower()
+
+    if ext == ".pdf":
+        return extract_from_pdf(path)   # existing PDF pipeline
+    else:
+        return extract_from_image(path)  # direct OCR
+
+
 if __name__ == "__main__":
-    pdf_path = "../pdfs/sample_statement.pdf"
-    raw_text = extract_with_pdfplumber(pdf_path)
+    pdf_path = "../../../sample_pdfs/sample_image.jpeg"
+    raw_text = extract_text_auto(pdf_path)
     print(raw_text)
-
-
