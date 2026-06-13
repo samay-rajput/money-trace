@@ -1,7 +1,18 @@
-from backend.ai_pipeline.graph.state import StatementState
+from graph.state import GraphState
 
 
-def route_after_validation(state: StatementState) -> str:
-    if state.get("needs_repair"):
-        return "repair"
-    return "label"
+MAX_RETRIES = 3
+
+
+def validation_router(state: GraphState) -> str:
+    """
+    Decides where the graph goes after validation.
+    """
+
+    if state["valid"]:
+        return "success"
+
+    if state["retry_count"] >= MAX_RETRIES:
+        return "failed"
+
+    return "repair"

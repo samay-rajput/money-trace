@@ -1,40 +1,41 @@
-from backend.ai_pipeline.agents.labeling_agent import label_expenses
-from backend.ai_pipeline.agents.repair_agent import repair_transactions
-from backend.ai_pipeline.agents.structuring_agent import build_table
-from backend.ai_pipeline.agents.validation_agent import validate_transactions
-from backend.ai_pipeline.graph.routing import route_after_validation
-from backend.ai_pipeline.graph.state import StatementState
+from langgraph.graph import StateGraph, END
+
+from graph.state import GraphState
+from graph.routing import validation_router
+
+from agents.structuring_agent import structuring_agent
+from agents.validation_agent import validation_agent
+from agents.repair_agent import repair_agent
 
 
-def structure_node(state: StatementState) -> StatementState:
-    state["transactions"] = build_table(state.get("cleaned_text", ""))
-    return state
+def build_workflow():
 
+    graph = StateGraph(GraphState)
 
-def validation_node(state: StatementState) -> StatementState:
-    validation_result = validate_transactions(state.get("transactions", []))
-    state["validation_errors"] = validation_result["errors"]
-    state["needs_repair"] = not validation_result["is_valid"]
-    return state
+    # Nodes
+    graph.add_node("structuring", structuring_agent)
+    graph.add_node("validation", validation_agent)
+    graph.add_node("repair", repair_agent)
 
+    # Entry point
+    graph.set_entry_point("structuring")
 
-def repair_node(state: StatementState) -> StatementState:
-    state["transactions"] = repair_transactions(
-        state.get("transactions", []),
-        state.get("validation_errors", []),
+    # Normal edges
+    graph.add_edge("structuring", "validation")
+    graph.add_edge("repair", "validation")
+
+    # Conditional routing
+    graph.add_conditional_edges(
+        "validation",
+        validation_router,
+        {
+            "success": END,
+            "repair": "repair",
+            "failed": END,
+        },
     )
-    state["needs_repair"] = False
-    return state
+
+    return graph.compile()
 
 
-def labeling_node(state: StatementState) -> StatementState:
-    state["labeled_transactions"] = label_expenses(state.get("transactions", []))
-    return state
-
-
-def run_statement_workflow(state: StatementState) -> StatementState:
-    state = structure_node(state)
-    state = validation_node(state)
-    if route_after_validation(state) == "repair":
-        state = repair_node(state)
-    return labeling_node(state)
+workflow = build_workflow()

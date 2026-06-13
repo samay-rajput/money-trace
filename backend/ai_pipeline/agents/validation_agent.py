@@ -1,13 +1,32 @@
-from typing import Any
 
+from schemas.statement_schema import Statement
+from graph.state import GraphState
 
-def validate_transactions(transactions: list[dict[str, Any]]) -> dict[str, Any]:
+from pydantic import ValidationError
+
+"""
+    Validates extracted transaction JSON.
+
+    Updates:
+        state["valid"]
+        state["validation_errors"]
+"""
+
+def validation_agent(state: GraphState) -> GraphState:
+
+    extracted_json = state["extracted_json"]
+
     errors = []
 
-    if not isinstance(transactions, list):
-        errors.append("Transactions must be a list.")
+    try:
+        Statement.model_validate(extracted_json)
 
-    return {
-        "is_valid": not errors,
-        "errors": errors,
-    }
+    except ValidationError as e:
+        errors.extend(
+            [err["msg"] for err in e.errors()]
+        )
+
+    state["valid"] = len(errors) == 0
+    state["validation_errors"] = errors
+
+    return state

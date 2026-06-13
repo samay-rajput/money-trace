@@ -1,11 +1,13 @@
-from typing import Any, TypedDict
+from typing import TypedDict
 
 
-class StatementState(TypedDict, total=False):
-    file_path: str
-    raw_text: str
+class GraphState(TypedDict):
     cleaned_text: str
-    transactions: list[dict[str, Any]]
-    labeled_transactions: list[dict[str, Any]]
+
+    extracted_json: dict
+
+    valid: bool
+
     validation_errors: list[str]
-    needs_repair: bool
+
+    retry_count: int

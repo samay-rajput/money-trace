@@ -1,8 +1,9 @@
-from typing import Any
+def repair_agent(state):
 
+    repaired = ...
 
-def repair_transactions(
-    transactions: list[dict[str, Any]],
-    validation_errors: list[str],
-) -> list[dict[str, Any]]:
-    return transactions
+    state["extracted_json"] = repaired
+
+    state["retry_count"] += 1
+
+    return state
