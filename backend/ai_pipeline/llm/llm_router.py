@@ -29,18 +29,39 @@ def generate_structured(
     schema: Type[BaseModel]
 ):
 
+    # try:
+
+    #     llm = get_gemini_llm()
+
+    #     structured_llm = llm.with_structured_output(schema)
+
+    #     return structured_llm.invoke(prompt)
+
+    # except Exception:
+
+    #     llm = get_groq_llm()
+
+    #     structured_llm = llm.with_structured_output(schema)
+
+    #     return structured_llm.invoke(prompt)
     try:
+
+        print("Using Gemini")
 
         llm = get_gemini_llm()
 
         structured_llm = llm.with_structured_output(schema)
 
-        return structured_llm.invoke(prompt)
+        result = structured_llm.invoke(prompt)
 
-    except Exception:
+        print("Gemini Success")
 
-        llm = get_groq_llm()
+        return result
 
-        structured_llm = llm.with_structured_output(schema)
+    except Exception as e:
 
-        return structured_llm.invoke(prompt)
+        print("\nGemini Failed")
+        print(type(e).__name__)
+        print(e)
+
+        raise

@@ -33,3 +33,10 @@ Thumbs.db
 *.log
 tmp/
 temp/
+
+
+## test ouputs
+backend/text_graph.py
+backend/test_real_statement.py
+backend/gemini_text.py
+
