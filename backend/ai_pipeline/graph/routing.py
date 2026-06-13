@@ -1,4 +1,4 @@
-from graph.state import GraphState
+from ai_pipeline.graph.state import GraphState
 
 
 MAX_RETRIES = 3

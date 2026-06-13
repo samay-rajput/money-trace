@@ -1,12 +1,11 @@
 from langgraph.graph import StateGraph, END
 
-from graph.state import GraphState
-from graph.routing import validation_router
+from ai_pipeline.graph.state import GraphState
+from ai_pipeline.graph.routing import validation_router
 
-from agents.structuring_agent import structuring_agent
-from agents.validation_agent import validation_agent
-from agents.repair_agent import repair_agent
-
+from ai_pipeline.agents.structuring_agent import structuring_agent
+from ai_pipeline.agents.validation_agent import validation_agent
+from ai_pipeline.agents.repair_agent import repair_agent
 
 def build_workflow():
 
@@ -39,3 +38,5 @@ def build_workflow():
 
 
 workflow = build_workflow()
+
+
